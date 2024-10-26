@@ -1,0 +1,134 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <ctype.h>
+
+#define grupo_animais 5
+
+// Estrutura que armazena informações sobre os animais
+typedef struct {
+    char nome[50];
+    char dicas[5][100];  // Array de dicas
+    char tipo[20];
+} animal;
+
+// Função para selecionar um animal aleatoriamente
+animal escolher_animal(int dificuldade) {
+    animal animais[17] = {
+        {"Cavalo", {"Capaz de carregar cargas pesadas.", "Dorme em pé.", "Podem ser treinados para competições e trabalhos agrícolas.", "É um animal muito inteligente.", "Corre como um carro."}, "Herbívoro"},
+        {"Vaca", {"Uma das principais fontes de leite no mundo.", "Normalmente encontrada em fazendas", "Muge.", "Têm sido domesticada há milhares de anos.", "Símbolo de riqueza e fertilidade em muitas culturas."}, "Herbívoro"},
+        {"Elefante", {"É o maior mamífero terrestre.", "Possui uma memória excepcional.", "Têm grandes orelhas.", "Possui uma tromba multifuncional.", "Possui presas de marfim."}, "Herbívoro"},
+        {"Girafa", {"É o animal terrestre mais alto do mundo.", "Come folhas de árvores altas, como acácias.", "Sua pele é coberta por manchas.", "Sua língua e pescoço são longos.", "Se comunicam através de sons de baixa frequência."}, "Herbívoro"},
+        {"Coelho", {"Adora cenouras.", "Possui orelhas longas.", "É um excelente escavador.", "Conhecido como símbolo de fertilidade.", "Pode ser um animal de estimação."}, "Herbívoro"},
+        {"Tartaruga marinha", {"Possui um casco duro.", "Pode viver mais de 100 anos.", "Vive principalmente nos oceanos.", "As fêmeas retornam à praia para desovar.", "Espécie ameaçada de extinção."}, "Onívoro"},
+        {"Tigre", {"Maior felino do mundo.", "É um caçador solitário.", "Encontrado principalmente na Ásia.", "Possui listras em sua pelagem.", "É um animal territorial."}, "Carnívoro"},
+        {"Lobo", {"Vive em matilhas.", "É um animal territorial.", "É um caçador estratégico.", "Consegue se comunicar por uivos.", "Pode ser encontrado em diversos habitats."}, "Carnívoro"},
+        {"Pinguim", {"É uma ave, mas não voa.", "Vive em regiões frias.", "Os machos chocam os ovos.", "É um excelente nadador.", "Muitas espécies formam pares monogâmicos." }, "Carnívoro"},
+        {"Baleia", {"É o maior animal do mundo.", "É um mamífero.", "Vive nos oceanos e realizam migrações anuais.", "Podem se comunicar através de canções longas e complexas.", "São animais muito inteligentes."}, "Carnívoro"},
+        {"Urso", {"Sua dieta pode variar de mel a peixes.", "É um símbolo de força.", "Hiberna durante o inverno.", "Pode ser encontrado em diferentes regiões do mundo.", "Apesar de seu tamanho, consegue correr rapidamente em curtas distâncias."}, "Onívoro"},
+        {"Porco", {"Tem um focinho altamente sensível", "Adora tomar banho de lama.", "São frequentemente domesticados, até mesmo como animais de estimação.", "É considerado um dos mais espertos do reino animal.", "Conhecidos por comerem sobras."}, "Onívoro"},
+        {"Gato", {"É um animal de estimação popular.", "Gosta de caçar pequenos animais.", "Conhecidos por sua natureza independente.", "É um animal dorminhoco.", "Têm um instinto territorial."}, "Onívoro"},
+        {"Cachorro", {"Famoso por ser o melhor amigo do homem.", "Precisam de exercício regular.", "Existem mais de 300 raças diferentes.", "Podem agir como animais de serviço.", "Adoram brincar e socializar."}, "Onívoro"},
+        {"Arara azul", {"Pode imitar sons humanos.", "Vive em casais ou pequenos grupos.", "Tem uma plumagem azul vibrante", "Encontrada na América do Sul.", "Está em risco de extinção."}, "Herbívoro"}
+
+    };
+
+    // Nível de dificuldade
+    int inicio = 0;
+    int quantidade = 0;
+
+    if (dificuldade == 1) { // Fácil
+        inicio = 0;
+        quantidade = 5;
+    } else if (dificuldade == 2) { // Médio
+        inicio = 5;
+        quantidade = 5;
+    } else { // Difícil
+        inicio = 10;
+        quantidade = 5;
+    }
+
+    return animais[inicio + (rand() % quantidade)];
+}
+
+// Função para comparar strings sem diferenciar maiúsculas e minúsculas
+int compara_strings(const char* str1, const char* str2) {
+    while (*str1 && *str2) {
+        if (tolower((unsigned char)*str1) != tolower((unsigned char)*str2)) {
+            return 0; 
+        }
+        str1++;
+        str2++;
+    }
+    return (*str1 == *str2);  // Verifica se ambas terminaram ao mesmo tempo
+}
+
+int main() {
+    srand(time(0));
+    int dificuldade;
+    char resposta[50];
+    int jogar_novamente;
+    char nome_jogador[50];
+    int pontos = 0;
+    int multiplicador_pontos = 1;  // Variável para armazenar o multiplicador de pontos
+
+    // Armazena nome do jogador
+    printf("Digite seu nome: ");
+    scanf("%s", nome_jogador);
+
+    do {
+        printf("Escolha a dificuldade:\n");
+        printf(" 1 - Fácil\n 2 - Médio\n 3 - Difícil\n");
+        scanf("%d", &dificuldade);
+
+        // Define o multiplicador de pontos com base na dificuldade
+        if (dificuldade == 1) {
+            multiplicador_pontos = 1;  // Fácil = 1 ponto
+        } else if (dificuldade == 2) {
+            multiplicador_pontos = 2;  // Médio = 2 pontos
+        } else {
+            multiplicador_pontos = 3;  // Difícil = 3 pontos
+        }
+
+        animal escolhido = escolher_animal(dificuldade);
+        int tentativas = 0;
+        int max_tentativas = (dificuldade == 1) ? 5 : (dificuldade == 2) ? 4 : 3;
+        int acertou = 0;
+
+        printf("Adivinhe qual é o animal. Dica: %s\n", escolhido.dicas[0]);
+
+        while (tentativas < max_tentativas && !acertou) {
+            printf("Você ainda tem %d dicas disponíveis.\n", max_tentativas - tentativas - 1);  // Mostra dicas restantes
+            printf("Tentativa %d: ", tentativas + 1);
+            scanf("%s", resposta);
+            tentativas++;
+
+            // Verifica se a resposta está correta, ignorando maiúsculas/minúsculas
+            if (compara_strings(resposta, escolhido.nome) == 1) {
+                acertou = 1;
+                pontos += multiplicador_pontos;  // Incrementa os pontos com base no multiplicador
+            } else {
+                printf("Errado. Tente novamente.\n");
+                if (tentativas < 3) { // Dicas na tentativa do erro
+                    printf("Dica: %s\n", escolhido.dicas[tentativas]); // Dica nova a cada erro
+                }
+            }
+        }
+
+        if (acertou) {
+            printf("Parabéns, você acertou o animal!\n");
+        } else {
+            printf("Você não acertou! O animal era: %s.\n", escolhido.nome);
+        }
+
+        printf("Seus pontos: %d\n", pontos); 
+
+        printf("Deseja jogar novamente? 1 - Sim / 2 - Não: ");
+        scanf("%d", &jogar_novamente);
+
+    } while (jogar_novamente == 1);
+
+    printf("Obrigado por jogar, %s! Você terminou com %d pontos.\n", nome_jogador, pontos);
+    return 0;
+}
