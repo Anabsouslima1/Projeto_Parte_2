@@ -1,0 +1,133 @@
+#include <stdio.h>
+#include <stdlib.h> 
+
+
+#define LINHAS 20
+#define COLUNAS 20
+
+
+char labirinto[LINHAS][COLUNAS] = {
+    {'*', ' ', '*', '*', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*'},
+    {'*', ' ', ' ', ' ', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', '*', '*', '*', ' ',' ', ' ', '*', '*', ' ','*', '*', '*', '*', '*'},
+    {'*', ' ', '*', ' ', ' ',' ', ' ', '*', '*', '*','*', ' ', '*', '*', ' ','*', '*', '*', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', '*', '*', '*','*', ' ', ' ', ' ', ' ',' ', ' ', '*', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', ' ', ' ', '*','*', '*', '*', '*', '*','*', ' ', ' ', '*', '*'},
+    {'*', ' ', ' ', ' ', '*','*', ' ', '*', ' ', '*','*', '*', '*', '*', '*','*', '*', ' ', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', '*', '*', '*','*', '*', '*', '*', '*','*', '*', ' ', '*', '*'},
+    {'*', ' ', '*', ' ', ' ',' ', ' ', '*', '*', '*','*', '*', ' ', ' ', ' ','*', '*', ' ', '*', '*'},
+    {'*', ' ', '*', '*', '*','*', ' ', ' ', ' ', ' ',' ', ' ', ' ', '*', ' ',' ', ' ', ' ', '*', '*'},
+    {'*', '*', '*', '*', '*','*', '*', '*', ' ', ' ','*', '*', '*', '*', '*','*', '*', ' ', '*', '*'},
+    {'*', ' ', ' ', ' ', '*','*', '*', '*', ' ', '*','*', ' ', '*', '*', '*','*', ' ', ' ', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', '*', '*', '*', '*','*', ' ', '*', '*', '*','*', ' ', '*', '*', '*'},
+    {'*', ' ', '*', ' ', ' ',' ', ' ', '*', '*', '*','*', ' ', '*', '*', '*','*', ' ', '*', '*', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', '*', '*', '*','*', ' ', '*', '*', '*','*', ' ', ' ', ' ', '*'},
+    {'*', '*', '*', ' ', '*','*', ' ', ' ', ' ', '*','*', ' ', '*', '*', '*','*', '*', '*', ' ', '*'},
+    {'*', ' ', ' ', ' ', '*','*', ' ', '*', ' ', ' ',' ', ' ', ' ', ' ', ' ',' ', '*', '*', ' ', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', '*', ' ', '*','*', ' ', '*', '*', '*',' ', '*', '*', ' ', '*'},
+    {'*', ' ', '*', ' ', '*','*', ' ', '*', ' ', ' ','*', ' ', '*', '*', '*',' ', ' ', ' ', ' ', 'S'},
+    {'*', '*', '*', '*', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*','*', '*', '*', '*', '*'}
+
+};
+
+// Posição inicial do jogador
+int jogador_x = 0, jogador_y = 1;
+
+void iniciar_jogo() {
+    jogador_x = 0;
+    jogador_y = 1;
+}
+
+
+void desenho_labirinto() {
+    system("clear");
+
+
+    for (int i = 0; i < LINHAS; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            if (i == jogador_x && j == jogador_y) {
+                printf("J "); 
+            } else {
+                printf("%c ", labirinto[i][j]);
+            }
+        }
+        printf("\n");
+    }
+}
+
+// Função para mover o jogador
+int m_jogador(char direcao) {
+    int nova_posicao_x = jogador_x, nova_posicao_y = jogador_y;
+
+
+    switch (direcao) {
+        case 'w': // Cima
+            nova_posicao_x--;
+            break;
+        case 's': // Baixo
+            nova_posicao_x++;
+            break;
+        case 'a': // Esquerda
+            nova_posicao_y--;
+            break;
+        case 'd': // Direita
+            nova_posicao_y++;
+            break;
+        default:
+            return 0;
+    }
+
+    // Verifica se a nova posição é um espaço vazio ou a saída
+    if (labirinto[nova_posicao_x][nova_posicao_y] == ' ' || labirinto[nova_posicao_x][nova_posicao_y] == 'S') {
+        jogador_x = nova_posicao_x;
+        jogador_y = nova_posicao_y;
+        return 1;
+    }
+    return 0;
+}
+
+void minigame_labirinto(){
+    char direcao;
+    char jogar_novamente;
+
+    do {
+        iniciar_jogo();
+        int jogo_funcionando = 1;
+        desenho_labirinto();
+
+        // Loop principal do jogo
+        while (jogo_funcionando) {
+            printf("\n w (cima), s (baixo), a (esquerda), d (direita)\n");
+            direcao = getchar(); //Ve qual tecla foi pressionada
+
+            if (direcao == '\n') {
+                continue; 
+            }
+
+            if (m_jogador(direcao)) {
+                desenho_labirinto();
+            } else {
+                printf("Você perdeu!\n");
+                jogo_funcionando = 0; // Finaliza o jogo
+            }
+
+            // Verifica se o jogador chegou na saída
+            if (labirinto[jogador_x][jogador_y] == 'S') {
+                printf("\nVocê encontrou a saída!\n");
+                jogo_funcionando = 0; // Finaliza o jogo
+            }
+        }
+
+        // Pergunta se o jogador quer jogar novamente
+        printf("Deseja tentar novamente? (s/n): ");
+        getchar(); 
+        jogar_novamente = getchar();
+
+    } while (jogar_novamente == 's' || jogar_novamente == 'S');
+
+}
+
+int main() {
+    minigame_labirinto();
+    return 0;
+}
