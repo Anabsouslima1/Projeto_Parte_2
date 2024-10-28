@@ -49,52 +49,50 @@ int main() {
     setlocale(LC_ALL, ""); 
     srand(time(0));
     char resposta[50];
-    int jogar_novamente;
     char nome_jogador[50];
     int pontos = 0;
+    
     printf("Digite seu nome: ");
     scanf("%s", nome_jogador);
 
-    do {
-        int indice = 0; 
-        int tentativas;
-        int max_tentativas = 3; 
-        int acertou;
+    int indice = 0; 
+    int tentativas;
+    int max_tentativas = 3; 
+    int acertou;
 
-        while (indice < grupo_animais) {
-            animal escolhido = escolher_animal(&indice);
-            tentativas = 0;
-            acertou = 0;
-            printf("Adivinhe qual é o animal. Dica: %s\n", escolhido.dicas[0]);
-            while (tentativas < max_tentativas && !acertou) {
-                printf("Tentativa %d: ", tentativas + 1);
-                scanf("%s", resposta);
-                tentativas++;
-                if (compara_strings(resposta, escolhido.nome)) {
-                    acertou = 1;
-                    pontos++;
-                } else {
-                    printf("Errado. Tente novamente.\n");
-                    if (tentativas < max_tentativas) {
-                        printf("Dica: %s\n", escolhido.dicas[tentativas - 1]);
-                    }
+    while (indice < grupo_animais) {
+        animal escolhido = escolher_animal(&indice);
+        tentativas = 0;
+        acertou = 0;
+        
+        printf("Adivinhe qual é o animal. Dica: %s\n", escolhido.dicas[0]);
+        
+        while (tentativas < max_tentativas && !acertou) {
+            printf("Tentativa %d: ", tentativas + 1);
+            scanf("%s", resposta);
+            tentativas++;
+            if (compara_strings(resposta, escolhido.nome)) {
+                acertou = 1;
+                pontos++;
+            } else {
+                printf("Errado. Tente novamente.\n");
+                if (tentativas < max_tentativas) {
+                    printf("Dica: %s\n", escolhido.dicas[tentativas - 1]);
                 }
             }
-
-            if (acertou) {
-                printf("Parabéns, você acertou o animal %s!\n", escolhido.nome);
-            } else {
-                printf("Você não acertou! O animal era: %s.\n", escolhido.nome);
-            }
-            printf("Seus pontos: %d\n", pontos); 
         }
 
-        printf("Obrigado por acertar! Você adivinhou todos os animais.\n");
-        printf("Você terminou com %d pontos.\n", pontos);
-        printf("Deseja jogar novamente? 1 - Sim / 2 - Não: ");
-        scanf("%d", &jogar_novamente);
+        if (acertou) {
+            printf("Parabéns, você acertou o animal %s!\n", escolhido.nome);
+        } else {
+            printf("Você não acertou! O animal era: %s.\n", escolhido.nome);
+        }
+        printf("Seus pontos: %d\n", pontos); 
+    }
 
-    } while (jogar_novamente == 1);
+    printf("Você adivinhou todos os animais!\n");
+    printf("Você terminou com %d pontos.\n", pontos);
     printf("Obrigado por jogar, %s!\n", nome_jogador);
+    
     return 0;
 }
