@@ -249,6 +249,9 @@ int minigame_adivinha(const char *nome_jogador) {
 
   for (int i = 0; i < 5; i++) {
     animal escolhido = escolher_animal(animais_usados);
+    if (compara_strings(escolhido.nome, " ")) {
+      break;
+    }
     int tentativas = 0;
     int max_tentativas = 5;
     int acertou = 0;
@@ -283,6 +286,7 @@ int minigame_adivinha(const char *nome_jogador) {
       tabulacao("==----------------------------==");
     } else {
       printf("\tVocê não acertou. O animal era: %s.\n", escolhido.nome);
+      tabulacao("==----------------------------==");
     }
   }
   printf("\n\t     Pontuação total: %d pontos\n\n", p1);
@@ -368,7 +372,9 @@ int minigame_palavras() {
         printf(PURPLE "\t      Você ganhou %d pontos!\n" RESET, pontos_ganhos);
         tabulacao("==----------------------------==");
       } else {
+        tabulacao("==----------------------------==");
         printf("Você já encontrou essa palavra: %s\n", palavra_digitada);
+        tabulacao("==----------------------------==");
       }
       free(palavra_digitada);
 
@@ -564,7 +570,6 @@ char labirinto[LINHAS][COLUNAS] = {
      '*', '*', '*', '*', '*', '*', '*', '*', '*', '*'}
 
 };
-
 // Posição inicial do jogador
 int jogador_x = 0, jogador_y = 1;
 
@@ -578,7 +583,7 @@ void desenho_labirinto() {
   for (int i = 0; i < LINHAS; i++) {
     for (int j = 0; j < COLUNAS; j++) {
       if (i == jogador_x && j == jogador_y) {
-        printf("J ");
+        printf("🐶");
       } else {
         printf("%c ", labirinto[i][j]);
       }
@@ -628,7 +633,15 @@ int minigame_labirinto() {
 
   // Loop principal do jogo
   while (jogo_funcionando) {
-    printf("\n w (cima), s (baixo), a (esquerda), d (direita)\n");
+
+    tabulacao("\nTeclas de comandos:");
+    tabulacao("A - Esquerda");
+    tabulacao("W - Cima");
+    tabulacao("S - Baixo");
+    tabulacao("D - Direita");
+    tabulacao("\nDica: Você consegue usar mais de uma vez o mesmo comando.");
+    tabulacao("Exemplo: ddd (ada 3 vezes para a direita");
+
     direcao = getchar(); // Ve qual tecla foi pressionada
 
     if (direcao == '\n') {
@@ -669,7 +682,8 @@ void print_wait(const char *texto) {
   getchar();
 }
 
-Personagem recrutadora = {"Dona Annelise", "🐾"}
+Personagem recrutadora = {"Dona Annelise", "🐾"
+}
 ;
 
 void contar_historia(const char *nome_jogador) {
@@ -796,7 +810,8 @@ int main() {
   int pontuacao_geral = p1 + p2 + p3;
 
   if (pontuacao_geral >= 50) {
-    printf("%d", pontuacao_geral);
+
+    printf("\n Pontuação Geral: %d\n", pontuacao_geral);
     dialogo(recrutadora, "Meus parabéns! Você passou!");
     dialogo(recrutadora, "Você demonstrou conhecimento, agilidade e braveza "
                          "nos testes de hoje.");
@@ -807,7 +822,7 @@ int main() {
                    "horas complementares em seu ano final!" RESET);
 
   } else {
-    printf("%d", pontuacao_geral);
+    printf("\n Pontuação Geral: %d\n", pontuacao_geral);
     dialogo(recrutadora, "E, sinto muito, mas não poderemos receber você como "
                          "voluntário nesse momento.");
     dialogo(recrutadora, "Mas, ei, quem sabe numa próxima vez?");
