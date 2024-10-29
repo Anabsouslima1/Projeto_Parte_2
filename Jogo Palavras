@@ -1,0 +1,202 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <ctype.h>
+
+#define LINHAS 20
+#define COLUNAS 20
+#define MAX_PALAVRAS 7
+
+void criar_matriz(char matriz[LINHAS][COLUNAS]);
+void aparecer_matriz(char matriz[LINHAS][COLUNAS]);
+void inserir_palavra(char matriz[LINHAS][COLUNAS], char palavra[]);
+void letras_aleatorias(char matriz[LINHAS][COLUNAS]);
+char *ler_palavra();
+int verificar_palavra(char matriz[LINHAS][COLUNAS], char palavra[]);
+void remover_palavra(char palavras[][20], int *num_palavras, char palavra[]);
+int palavra_encontrada(char palavras_encontradas[][20], int num_encontradas, char *palavra);
+
+void minigame_palavras() {
+    char matriz[LINHAS][COLUNAS];
+    char palavras[MAX_PALAVRAS][20] = {"tucano", "peixeboi", "araraazul", "anta", "ariranha", "tartaruga", "tatubola"};
+    int num_palavras = MAX_PALAVRAS;
+    const char *dica = "Todos os animais estão ameaçados de extinção.";
+
+    char palavras_encontradas[MAX_PALAVRAS][20];
+    int num_encontradas = 0; 
+
+    srand(time(NULL));
+
+    criar_matriz(matriz);
+
+    for (int i = 0; i < num_palavras; i++) {
+        inserir_palavra(matriz, palavras[i]);
+    }
+
+    letras_aleatorias(matriz);
+    aparecer_matriz(matriz);
+    printf("Dica: %s\n", dica); 
+
+    while (num_palavras > 0) {
+        char *palavra_digitada = ler_palavra();
+        if (!palavra_digitada) {
+            printf("Erro ao ler a palavra. Tente novamente.\n");
+            continue;
+        }
+
+        if (palavra_digitada[0] == 'D' || palavra_digitada[0] == 'd') {
+            printf("Você desistiu do jogo. Até a próxima!\n");
+            free(palavra_digitada);
+            break;
+        }
+
+        if (verificar_palavra(matriz, palavra_digitada)) {
+            if (!palavra_encontrada(palavras_encontradas, num_encontradas, palavra_digitada)) {
+                printf("Parabéns! Você encontrou a palavra: %s\n", palavra_digitada);
+                strcpy(palavras_encontradas[num_encontradas++], palavra_digitada);
+                remover_palavra(palavras, &num_palavras, palavra_digitada);
+            
+            } else {
+                printf("Você já encontrou essa palavra!\n");
+            }
+        } else {
+            printf("Palavra não encontrada ou inválida. Tente novamente.\n");
+        }
+
+        free(palavra_digitada);
+
+        if (num_palavras > 0) {
+            printf("Você ainda tem %d palavras para encontrar.\n", num_palavras);
+        } 
+    }
+
+    
+}
+
+void criar_matriz(char matriz[LINHAS][COLUNAS]) {
+    memset(matriz, ' ', sizeof(char) * LINHAS * COLUNAS);
+}
+
+void inserir_palavra(char matriz[LINHAS][COLUNAS], char palavra[]) {
+    int tamanho_palavra = strlen(palavra);
+    int linha, coluna, direcao;
+
+    int posicao_v;
+    do {
+        posicao_v = 1;
+        linha = rand() % LINHAS;
+        coluna = rand() % COLUNAS;
+        direcao = rand() % 2;
+
+        if (direcao == 0 && coluna + tamanho_palavra > COLUNAS) {
+            posicao_v = 0;
+        } else if (direcao == 1 && linha + tamanho_palavra > LINHAS) {
+            posicao_v = 0;
+        } else {
+            for (int i = 0; i < tamanho_palavra; i++) {
+                if (direcao == 0 && matriz[linha][coluna + i] != ' ') {
+                    posicao_v = 0;
+                    break;
+                } else if (direcao == 1 && matriz[linha + i][coluna] != ' ') {
+                    posicao_v = 0;
+                    break;
+                }
+            }
+        }
+    } while (!posicao_v);
+
+    for (int i = 0; i < tamanho_palavra; i++) {
+        if (direcao == 0) {
+            matriz[linha][coluna + i] = palavra[i];
+        } else {
+            matriz[linha + i][coluna] = palavra[i];
+        }
+    }
+}
+
+void letras_aleatorias(char matriz[LINHAS][COLUNAS]) {
+    for (int i = 0; i < LINHAS; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            if (matriz[i][j] == ' ') {
+                matriz[i][j] = 'a' + rand() % 26;
+            }
+        }
+    }
+}
+
+void aparecer_matriz(char matriz[LINHAS][COLUNAS]) {
+    for (int i = 0; i < LINHAS; i++) {
+        printf("\t\t");
+        for (int j = 0; j < COLUNAS; j++) {
+            printf("%c ", matriz[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+char *ler_palavra() {
+    char palavra[20];
+    printf("Digite a palavra encontrada (ou d para desistir): ");
+    scanf("%19s", palavra);
+    char *resultado = malloc(strlen(palavra) + 1);
+    if (resultado) {
+        strcpy(resultado, palavra);
+    }
+    return resultado;
+}
+
+int verificar_palavra(char matriz[LINHAS][COLUNAS], char palavra[]) {
+    int tamanho_palavra = strlen(palavra);
+
+    for (int i = 0; i < LINHAS; i++) {
+        for (int j = 0; j < COLUNAS; j++) {
+            if (j + tamanho_palavra <= COLUNAS && 
+                memcmp(&matriz[i][j], palavra, tamanho_palavra) == 0) {
+                return 1;
+            }
+
+            if (i + tamanho_palavra <= LINHAS) {
+                int n = 1;
+                for (int k = 0; k < tamanho_palavra; k++) {
+                    if (matriz[i + k][j] != palavra[k]) {
+                        n = 0;
+                        break;
+                    }
+                }
+                if (n) {
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void remover_palavra(char palavras[][20], int *num_palavras, char palavra[]) {
+    for (int i = 0; i < *num_palavras; i++) {
+        if (strcmp(palavras[i], palavra) == 0) {
+            for (int j = i; j < *num_palavras - 1; j++) {
+                strcpy(palavras[j], palavras[j + 1]);
+            }
+            (*num_palavras)--; 
+            break;
+        }
+    }
+}
+
+int palavra_encontrada(char palavras_encontradas[][20], int num_encontradas, char *palavra) {
+    for (int i = 0; i < num_encontradas; i++) {
+        if (strcmp(palavras_encontradas[i], palavra) == 0) {
+            return 1; // Palavra já encontrada
+        }
+    }
+    return 0; // Palavra não encontrada
+}
+
+int main() {
+    printf("Bem-vindo ao Caça-Palavras!\n");
+    minigame_palavras();
+    printf("Fim de jogo");
+    return 0;
+}
